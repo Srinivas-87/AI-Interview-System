@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Candidate Dashboard | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">INTERVIEW<span>.AI</span></div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/login">Logout</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <section class="welcome-section">
+            <p class="small-heading">CANDIDATE PORTAL</p>
+
+            <h1>Welcome to your dashboard 👋</h1>
+
+            <p>
+                Prepare for your interview, complete your profile,
+                and track your interview progress.
+            </p>
+        </section>
+
+        <section class="dashboard-grid">
+
+            <div class="dashboard-card">
+                <div class="card-icon">👤</div>
+                <h2>My Profile</h2>
+                <p>Update your personal and professional details.</p>
+                <a href="/candidate/profile" class="card-button">
+                    Open Profile
+                </a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🎯</div>
+                <h2>Interview Setup</h2>
+                <p>Choose your interview and prepare for the session.</p>
+                <a href="/candidate/interview-setup" class="card-button">
+                    Start Setup
+                </a>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">📊</div>
+                <h2>My Progress</h2>
+                <p>View your interview status and performance.</p>
+                <a href="#" class="card-button">
+                    View Progress
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

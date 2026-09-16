@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>System Check | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">INTERVIEW<span>.AI</span></div>
+
+        <div class="nav-links">
+            <a href="/candidate/dashboard">Dashboard</a>
+            <a href="/candidate/interview-setup">Back</a>
+            <a href="/login">Logout</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <section class="welcome-section">
+            <p class="small-heading">TECHNICAL VERIFICATION</p>
+
+            <h1>System Check 🛠️</h1>
+
+            <p>
+                Please check your device before starting the interview.
+            </p>
+        </section>
+
+        <section class="dashboard-grid">
+
+            <div class="dashboard-card">
+                <div class="card-icon">📷</div>
+                <h2>Camera Check</h2>
+                <p id="cameraStatus">Camera not checked</p>
+
+                <button class="card-button" onclick="checkCamera()">
+                    Check Camera
+                </button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🎙️</div>
+                <h2>Microphone Check</h2>
+                <p id="micStatus">Microphone not checked</p>
+
+                <button class="card-button" onclick="checkMicrophone()">
+                    Check Microphone
+                </button>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">🌐</div>
+                <h2>Internet Check</h2>
+                <p id="internetStatus">Internet connection available</p>
+
+                <button class="card-button" onclick="checkInternet()">
+                    Check Internet
+                </button>
+            </div>
+
+        </section>
+
+        <div style="text-align:center; margin-top:30px;">
+            <button class="card-button" onclick="startInterview()">
+                Start Interview →
+            </button>
+
+            <p id="finalStatus" style="margin-top:15px;"></p>
+        </div>
+
+    </main>
+
+    <script>
+        let cameraChecked = false;
+        let microphoneChecked = false;
+        let internetChecked = false;
+
+        async function checkCamera() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true });
+
+                document.getElementById("cameraStatus").innerText =
+                    "Camera working successfully ✅";
+
+                cameraChecked = true;
+            } catch (error) {
+                document.getElementById("cameraStatus").innerText =
+                    "Camera permission denied ❌";
+            }
+        }
+
+        async function checkMicrophone() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                document.getElementById("micStatus").innerText =
+                    "Microphone working successfully ✅";
+
+                microphoneChecked = true;
+            } catch (error) {
+                document.getElementById("micStatus").innerText =
+                    "Microphone permission denied ❌";
+            }
+        }
+
+        function checkInternet() {
+            if (navigator.onLine) {
+                document.getElementById("internetStatus").innerText =
+                    "Internet connection available ✅";
+
+                internetChecked = true;
+            } else {
+                document.getElementById("internetStatus").innerText =
+                    "No internet connection ❌";
+            }
+        }
+
+        function startInterview() {
+            if (cameraChecked && microphoneChecked && internetChecked) {
+                window.location.href = "/candidate/interview-room";
+            } else {
+                document.getElementById("finalStatus").innerText =
+                    "Please complete all system checks first.";
+            }
+        }
+    </script>
+
+</body>
+</html>

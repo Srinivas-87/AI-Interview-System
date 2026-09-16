@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Result | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .result-card, .feedback-box {
+            background: white;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+        }
+
+        .result-card {
+            text-align: center;
+        }
+
+        .result-card h1 {
+            color: #6256e8;
+            font-size: 42px;
+            margin: 15px 0;
+        }
+
+        .feedback-box {
+            margin-top: 30px;
+        }
+
+        .feedback-box h2 {
+            color: #6256e8;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: #fff3cd;
+            color: #856404;
+            font-weight: bold;
+        }
+
+        .answer-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 15px;
+        }
+
+        .answer-item h3 {
+            margin-bottom: 10px;
+        }
+
+        .answer-item p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .correct {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .wrong {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .partial {
+            color: #b58105;
+            font-weight: bold;
+        }
+
+        .button-area {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .result-button {
+            display: inline-block;
+            margin: 8px;
+            padding: 13px 22px;
+            border-radius: 10px;
+            background: #6256e8;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">INTERVIEW<span>.AI</span></div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('candidate_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</nav>
+
+<main class="dashboard-container">
+
+    <section class="welcome-section">
+        <p class="small-heading">INTERVIEW RESULT</p>
+        <h1>Your Interview Summary 📊</h1>
+        <p>AI evaluated your answers based on relevance and correctness.</p>
+    </section>
+
+    <section class="result-grid">
+
+        <div class="result-card">
+            <div class="card-icon">📝</div>
+            <h2>Total Questions</h2>
+            <h1 id="totalQuestions">5</h1>
+        </div>
+
+        <div class="result-card">
+            <div class="card-icon">✅</div>
+            <h2>Answered</h2>
+            <h1 id="answeredQuestions">0</h1>
+        </div>
+
+        <div class="result-card">
+            <div class="card-icon">📈</div>
+            <h2>Your Score</h2>
+            <h1 id="score">0%</h1>
+        </div>
+
+        <div class="result-card">
+            <div class="card-icon">🏆</div>
+            <h2>Eligibility</h2>
+            <h1 id="eligibility">Pending</h1>
+            <p>Minimum required score: 90%</p>
+        </div>
+
+    </section>
+
+    <section class="feedback-box">
+        <h2>Interview Status</h2>
+        <p>
+            <span class="status-badge" id="status">Participant</span>
+        </p>
+
+        <p id="feedback" style="margin-top:15px;">
+            Your interview result is being prepared.
+        </p>
+    </section>
+
+    <section class="feedback-box">
+        <h2>AI Answer Review 🤖</h2>
+        <div id="answerReview"></div>
+    </section>
+
+    <div class="button-area">
+        <a class="result-button"
+           href="{{ url_for('candidate_dashboard') }}">
+            ← Back to Dashboard
+        </a>
+
+        <a class="result-button"
+           href="{{ url_for('interview_setup') }}">
+            🔁 Retry Interview
+        </a>
+    </div>
+
+</main>
+
+<script>
+    const savedAnswers =
+        JSON.parse(localStorage.getItem("interviewAnswers")) || [];
+
+    const totalQuestions =
+        Number(localStorage.getItem("interviewQuestionCount")) || 5;
+
+    let totalScore = 0;
+
+    savedAnswers.forEach(item => {
+        totalScore += Number(item.score || 0);
+    });
+
+    const score = savedAnswers.length
+        ? Math.round((totalScore / (totalQuestions * 10)) * 100)
+        : 0;
+
+    document.getElementById("totalQuestions").innerText = totalQuestions;
+    document.getElementById("answeredQuestions").innerText = savedAnswers.length;
+    document.getElementById("score").innerText = score + "%";
+
+    const statusElement = document.getElementById("status");
+    const eligibilityElement = document.getElementById("eligibility");
+    const feedbackElement = document.getElementById("feedback");
+    const reviewElement = document.getElementById("answerReview");
+
+    if (score >= 90 && savedAnswers.length === totalQuestions) {
+
+        eligibilityElement.innerText = "Eligible";
+        eligibilityElement.style.color = "#198754";
+        eligibilityElement.style.fontSize = "25px";
+
+        statusElement.innerText = "Eligible and Completed";
+        statusElement.style.background = "#d4edda";
+        statusElement.style.color = "#155724";
+
+        feedbackElement.innerText =
+            "Excellent! You completed all questions and scored at least 90%.";
+
+    } else {
+
+        eligibilityElement.innerText = "Not Eligible";
+        eligibilityElement.style.color = "#dc3545";
+        eligibilityElement.style.fontSize = "25px";
+
+        statusElement.innerText = "Participant";
+        statusElement.style.background = "#fff3cd";
+        statusElement.style.color = "#856404";
+
+        feedbackElement.innerText =
+            "You are marked as Participant. Complete all questions and score at least 90% to become Eligible and Completed.";
+    }
+
+    if (savedAnswers.length === 0) {
+
+        reviewElement.innerHTML =
+            "<p>No evaluated answers found.</p>";
+
+    } else {
+
+        savedAnswers.forEach((item, index) => {
+
+            let statusClass = "wrong";
+
+            if (item.status === "Correct") {
+                statusClass = "correct";
+            } else if (item.status === "Partially Correct") {
+                statusClass = "partial";
+            }
+
+            const box = document.createElement("div");
+            box.className = "answer-item";
+
+            box.innerHTML = `
+                <h3>Question ${index + 1}</h3>
+                <p><strong>Question:</strong> ${escapeHTML(item.question)}</p>
+                <p><strong>Your Answer:</strong> ${escapeHTML(item.answer)}</p>
+                <p class="${statusClass}">
+                    Status: ${escapeHTML(item.status || "Incorrect")}
+                </p>
+                <p><strong>Score:</strong> ${item.score || 0}/10</p>
+                <p><strong>AI Feedback:</strong> ${escapeHTML(item.feedback || "No feedback")}</p>
+                <p><strong>Improve:</strong> ${escapeHTML(item.improvement || "Keep practicing")}</p>
+            `;
+
+            reviewElement.appendChild(box);
+        });
+    }
+
+    function escapeHTML(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+</script>
+
+</body>
+</html>

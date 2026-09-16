@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Choose Interview</title>
+
+    <style>
+        * {
+            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        }
+
+        body {
+            min-height: 100vh;
+            color: white;
+            background:
+                radial-gradient(circle at top left, #4936a5, transparent 35%),
+                radial-gradient(circle at bottom right, #087f8c, transparent 35%),
+                #090b20;
+            padding: 40px 8%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            color: #c9c9df;
+            font-size: 17px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 22px;
+            background: rgba(255,255,255,0.09);
+            backdrop-filter: blur(15px);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #8d7cff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+        }
+
+        .icon {
+            font-size: 55px;
+            margin-bottom: 18px;
+        }
+
+        .card h2 {
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: #d0d0e4;
+            min-height: 45px;
+            margin-bottom: 22px;
+        }
+
+        .card a {
+            display: inline-block;
+            padding: 12px 22px;
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(135deg, #7667ff, #00b8b0);
+            font-weight: bold;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 35px;
+            color: #d9d9ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Choose Your Interview 🚀</h1>
+        <p>Select a category and test your interview skills with AI.</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="icon">🐍</div>
+            <h2>Python</h2>
+            <p>Practice Python programming questions.</p>
+            <a href="/start-interview/python">Start Interview</a>
+        </div>
+
+        <div class="card">
+            <div class="icon">☕</div>
+            <h2>Java</h2>
+            <p>Improve your Java technical knowledge.</p>
+            <a href="/start-interview/java">Start Interview</a>
+        </div>
+
+        <div class="card">
+            <div class="icon">🗄️</div>
+            <h2>SQL</h2>
+            <p>Prepare database and SQL questions.</p>
+            <a href="/start-interview/sql">Start Interview</a>
+        </div>
+
+        <div class="card">
+            <div class="icon">🤖</div>
+            <h2>Machine Learning</h2>
+            <p>Practice AI and Machine Learning topics.</p>
+            <a href="/start-interview/machine-learning">
+                Start Interview
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="icon">💼</div>
+            <h2>HR Interview</h2>
+            <p>Prepare common HR interview questions.</p>
+            <a href="/start-interview/hr">Start Interview</a>
+        </div>
+
+    </div>
+
+    <a class="back" href="/">← Back to Home</a>
+
+</body>
+</html>

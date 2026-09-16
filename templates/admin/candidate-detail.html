@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Candidate Details | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .details-wrapper {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .details-header {
+            margin-bottom: 30px;
+        }
+
+        .details-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .details-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .details-card h2 {
+            margin-bottom: 18px;
+            color: #6256e8;
+        }
+
+        .details-card p {
+            margin: 12px 0;
+            color: #444;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: #fff3cd;
+            color: #856404;
+            font-weight: bold;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            background: #6256e8;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: #4b40c9;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            INTERVIEW<span>.AI</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_candidates') }}">Candidates</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <main class="details-wrapper">
+
+        <section class="details-header">
+            <p class="small-heading">CANDIDATE INFORMATION</p>
+
+            <h1>Candidate Details 👤</h1>
+
+            <p>
+                Review candidate profile and interview information.
+            </p>
+        </section>
+
+        {% if candidate %}
+
+        <section class="details-grid">
+
+            <div class="details-card">
+                <h2>👤 Personal Details</h2>
+
+                <p>
+                    <strong>Name:</strong>
+                    {{ candidate.name }}
+                </p>
+
+                <p>
+                    <strong>Email:</strong>
+                    {{ candidate.email }}
+                </p>
+
+                <p>
+                    <strong>Role:</strong>
+                    {{ candidate.role|capitalize }}
+                </p>
+
+                <p>
+                    <strong>User ID:</strong>
+                    {{ candidate.id }}
+                </p>
+            </div>
+
+            <div class="details-card">
+                <h2>💻 Technical Profile</h2>
+
+                <p>Python</p>
+                <p>Java</p>
+                <p>HTML & CSS</p>
+                <p>SQL</p>
+                <p>Artificial Intelligence & Machine Learning</p>
+            </div>
+
+            <div class="details-card">
+                <h2>📊 Interview Status</h2>
+
+                <p>
+                    <strong>Status:</strong>
+                    <span class="status">Pending</span>
+                </p>
+
+                <p>
+                    <strong>Score:</strong>
+                    Not evaluated
+                </p>
+
+                <p>
+                    <strong>AI Feedback:</strong>
+                    Awaiting interview
+                </p>
+            </div>
+
+        </section>
+
+        {% else %}
+
+        <div class="empty-message">
+            <h2>Candidate not found ❌</h2>
+
+            <p>
+                Please return to the candidates page and select a candidate.
+            </p>
+        </div>
+
+        {% endif %}
+
+        <a href="{{ url_for('admin_candidates') }}"
+           class="back-button">
+            ← Back to Candidates
+        </a>
+
+    </main>
+
+</body>
+
+</html>

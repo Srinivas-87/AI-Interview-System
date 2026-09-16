@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Interview Room | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .interview-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        #timer {
+            color: #6256e8;
+            font-size: 45px;
+        }
+
+        #message,
+        #feedback {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        #feedback {
+            padding: 15px;
+            border-radius: 12px;
+            background: #f3f4ff;
+            line-height: 1.6;
+        }
+
+        #timerWarning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .interview-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            INTERVIEW<span>.AI</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('candidate_dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Exit
+            </a>
+        </div>
+
+    </nav>
+
+    <main class="dashboard-container">
+
+        <section class="welcome-section">
+
+            <p class="small-heading">
+                LIVE AI INTERVIEW
+            </p>
+
+            <h1>
+                Welcome to Your Interview 🎤
+            </h1>
+
+            <p>
+                Answer every question clearly and confidently.
+                You have 15 minutes to complete this interview.
+            </p>
+
+        </section>
+
+        <section class="interview-layout">
+
+            <!-- QUESTION CARD -->
+
+            <div class="dashboard-card">
+
+                <h2>Interview Question</h2>
+
+                <p id="questionNumber">
+                    Question 1 of 5
+                </p>
+
+                <h3 id="questionText">
+                    Tell me about yourself.
+                </h3>
+
+                <textarea
+                    id="answer"
+                    rows="7"
+                    placeholder="Type your answer here..."
+                    autocomplete="off"
+                    onpaste="return false"
+                    oncopy="return false"
+                    oncut="return false"></textarea>
+
+                <button
+                    id="submitButton"
+                    class="card-button"
+                    onclick="submitAnswer()">
+
+                    Check Answer with AI 🤖
+
+                </button>
+
+                <p id="message"></p>
+
+                <div id="feedback"></div>
+
+            </div>
+
+            <!-- TIMER CARD -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    ⏱️
+                </div>
+
+                <h2>Time Remaining</h2>
+
+                <h1 id="timer">
+                    15:00
+                </h1>
+
+                <p>
+                    Complete all questions within 15 minutes.
+                </p>
+
+                <p id="timerWarning"></p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+
+        const questions = [
+            "Tell me about yourself.",
+            "What are your technical skills?",
+            "Explain one project you have completed.",
+            "What are your strengths and weaknesses?",
+            "Why should we hire you?"
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+        let totalSeconds = 900;
+        let interviewFinished = false;
+        let checkingAnswer = false;
+
+        const timerElement = document.getElementById("timer");
+        const warningElement = document.getElementById("timerWarning");
+        const answerElement = document.getElementById("answer");
+        const messageElement = document.getElementById("message");
+        const feedbackElement = document.getElementById("feedback");
+        const submitButton = document.getElementById("submitButton");
+
+        // ---------------- TIMER ----------------
+
+        const timer = setInterval(function () {
+
+            if (interviewFinished) {
+                clearInterval(timer);
+                return;
+            }
+
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+
+            timerElement.innerText =
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(seconds).padStart(2, "0");
+
+            if (totalSeconds <= 60) {
+                warningElement.innerText =
+                    "⚠️ Less than one minute remaining!";
+            }
+
+            if (totalSeconds <= 0) {
+                clearInterval(timer);
+                finishInterview();
+                return;
+            }
+
+            totalSeconds--;
+
+        }, 1000);
+
+        // ---------------- AI ANSWER CHECKING ----------------
+
+        async function submitAnswer() {
+
+            if (interviewFinished || checkingAnswer) {
+                return;
+            }
+
+            const answer = answerElement.value.trim();
+
+            if (answer.length < 20) {
+
+                messageElement.innerText =
+                    "Please enter at least 20 characters.";
+
+                return;
+            }
+
+            checkingAnswer = true;
+            submitButton.disabled = true;
+            submitButton.innerText = "AI is checking... 🤖";
+            messageElement.innerText = "Please wait...";
+            feedbackElement.innerText = "";
+
+            try {
+
+                const response = await fetch(
+                    "{{ url_for('evaluate_answer') }}",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            question: questions[currentQuestion],
+                            answer: answer
+                        })
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!result.success) {
+
+                    messageElement.innerText =
+                        result.message || "Evaluation failed.";
+
+                    submitButton.disabled = false;
+                    submitButton.innerText =
+                        "Check Answer with AI 🤖";
+                    checkingAnswer = false;
+
+                    return;
+                }
+
+                answers.push({
+                    question: questions[currentQuestion],
+                    answer: answer,
+                    score: result.score,
+                    status: result.status,
+                    feedback: result.feedback,
+                    improvement: result.improvement
+                });
+
+                messageElement.innerText =
+                    "AI Evaluation Completed ✅";
+
+                feedbackElement.innerHTML = `
+                    <strong>Status:</strong> ${result.status}<br>
+                    <strong>Score:</strong> ${result.score}/10<br>
+                    <strong>Feedback:</strong> ${result.feedback}<br>
+                    <strong>Improvement:</strong> ${result.improvement}
+                `;
+
+                currentQuestion++;
+
+                if (currentQuestion < questions.length) {
+
+                    setTimeout(function () {
+
+                        document.getElementById("questionNumber").innerText =
+                            "Question " +
+                            (currentQuestion + 1) +
+                            " of " +
+                            questions.length;
+
+                        document.getElementById("questionText").innerText =
+                            questions[currentQuestion];
+
+                        answerElement.value = "";
+                        feedbackElement.innerText = "";
+
+                        submitButton.disabled = false;
+                        submitButton.innerText =
+                            "Check Answer with AI 🤖";
+
+                        checkingAnswer = false;
+
+                    }, 2500);
+
+                } else {
+
+                    setTimeout(function () {
+                        finishInterview();
+                    }, 2500);
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                messageElement.innerText =
+                    "Server error. Check terminal.";
+
+                submitButton.disabled = false;
+                submitButton.innerText =
+                    "Check Answer with AI 🤖";
+
+                checkingAnswer = false;
+            }
+        }
+
+        // ---------------- FINISH INTERVIEW ----------------
+
+        function finishInterview() {
+
+            if (interviewFinished) {
+                return;
+            }
+
+            interviewFinished = true;
+
+            clearInterval(timer);
+
+            localStorage.setItem(
+                "interviewAnswers",
+                JSON.stringify(answers)
+            );
+
+            localStorage.setItem(
+                "interviewQuestionCount",
+                questions.length
+            );
+
+            document.getElementById("questionText").innerText =
+                "Interview Completed 🎉";
+
+            document.getElementById("questionNumber").innerText =
+                "Thank you for attending the interview.";
+
+            answerElement.style.display = "none";
+            submitButton.style.display = "none";
+
+            messageElement.innerText =
+                "Your responses were checked by AI.";
+
+            warningElement.innerText =
+                "Interview session ended.";
+
+            timerElement.innerText =
+                "00:00";
+
+            setTimeout(function () {
+
+                window.location.href =
+                    "{{ url_for('candidate_result') }}";
+
+            }, 2000);
+        }
+
+    </script>
+
+</body>
+
+</html>

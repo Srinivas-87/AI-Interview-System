@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>INTERVIEW.AI | Intelligent Hiring Platform</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">✦</span>
+            INTERVIEW<span>.AI</span>
+        </div>
+
+        <nav>
+            <a href="#platform">Platform</a>
+            <a href="#process">How It Works</a>
+            <a href="#security">Security</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="/login" class="login-link">Sign In</a>
+            <a href="/register" class="nav-button">Get Started</a>
+        </div>
+    </header>
+
+
+    <!-- Hero Section -->
+    <main>
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    Intelligent Interview Infrastructure
+                </div>
+
+                <h1>
+                    Hiring talent is hard.
+                    <span>Interviewing shouldn't be.</span>
+                </h1>
+
+                <p class="hero-description">
+                    INTERVIEW.AI helps companies conduct structured,
+                    secure and intelligent interviews with AI-powered
+                    evaluation, real-time monitoring and actionable insights.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="/register" class="primary-button">
+                        Start Your Interview
+                        <span>↗</span>
+                    </a>
+
+                    <a href="#platform" class="secondary-button">
+                        Explore Platform
+                        <span>→</span>
+                    </a>
+                </div>
+
+                <div class="trust-line">
+                    <span>✓ Structured Interviews</span>
+                    <span>✓ AI Evaluation</span>
+                    <span>✓ Secure Sessions</span>
+                </div>
+
+            </div>
+
+
+            <!-- Hero Visual -->
+            <div class="hero-visual">
+
+                <div class="glow-circle"></div>
+
+                <div class="dashboard-window">
+
+                    <div class="window-top">
+                        <div class="window-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="window-title">
+                            LIVE INTERVIEW SESSION
+                        </div>
+
+                        <div class="recording">
+                            <span></span>
+                            RECORDING
+                        </div>
+                    </div>
+
+                    <div class="interview-layout">
+
+                        <div class="candidate-video">
+                            <div class="video-label">Candidate</div>
+
+                            <div class="avatar">
+                                CS
+                            </div>
+
+                            <div class="candidate-name">
+                                Candidate Session
+                            </div>
+
+                            <div class="video-status">
+                                ● Camera Connected
+                            </div>
+                        </div>
+
+                        <div class="ai-panel">
+
+                            <div class="ai-heading">
+                                <div class="ai-icon">✦</div>
+
+                                <div>
+                                    <strong>AI Interviewer</strong>
+                                    <small>Active Session</small>
+                                </div>
+                            </div>
+
+                            <div class="question-box">
+                                <small>Current Question</small>
+
+                                <p>
+                                    Explain how you would design
+                                    a scalable machine learning system.
+                                </p>
+                            </div>
+
+                            <div class="evaluation-row">
+                                <div>
+                                    <small>Session Status</small>
+                                    <strong class="active-text">In Progress</strong>
+                                </div>
+
+                                <div>
+                                    <small>Integrity</small>
+                                    <strong>Verified</strong>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="window-footer">
+                        <span>Interview Duration: 18:42</span>
+                        <span>AI Evaluation Enabled</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Platform Section -->
+        <section class="platform-section" id="platform">
+
+            <div class="section-heading">
+                <p class="eyebrow">ONE PLATFORM. EVERY INTERVIEW.</p>
+
+                <h2>
+                    Built for modern
+                    <span>recruitment teams.</span>
+                </h2>
+
+                <p>
+                    From candidate screening to final evaluation,
+                    manage the complete interview lifecycle in one place.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+
+                <div class="feature-card">
+                    <div class="feature-icon">◈</div>
+                    <h3>AI-Powered Interviews</h3>
+                    <p>
+                        Conduct structured interviews with adaptive
+                        questions and intelligent follow-ups.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">◉</div>
+                    <h3>Smart Evaluation</h3>
+                    <p>
+                        Evaluate technical knowledge, communication,
+                        relevance and problem-solving skills.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⌁</div>
+                    <h3>Secure Monitoring</h3>
+                    <p>
+                        Monitor session integrity with camera,
+                        microphone and suspicious activity signals.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">▣</div>
+                    <h3>Recruiter Insights</h3>
+                    <p>
+                        Review candidate profiles, recordings,
+                        transcripts, scores and recruiter notes.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Process Section -->
+        <section class="process-section" id="process">
+
+            <div class="section-heading">
+                <p class="eyebrow">SIMPLE. STRUCTURED. INTELLIGENT.</p>
+
+                <h2>
+                    One seamless
+                    <span>interview workflow.</span>
+                </h2>
+            </div>
+
+            <div class="process-grid">
+
+                <div class="process-step">
+                    <div class="step-number">01</div>
+                    <h3>Create Profile</h3>
+                    <p>
+                        Candidate registers and submits profile
+                        and resume details.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">02</div>
+                    <h3>Start Interview</h3>
+                    <p>
+                        Complete system check and enter the
+                        secure interview room.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">03</div>
+                    <h3>AI Evaluation</h3>
+                    <p>
+                        Answers are analyzed for relevance,
+                        accuracy and communication.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">04</div>
+                    <h3>Recruiter Decision</h3>
+                    <p>
+                        Recruiters review evidence and make
+                        the final hiring decision.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Security Section -->
+        <section class="security-section" id="security">
+
+            <div class="security-content">
+
+                <p class="eyebrow">TRUST & INTEGRITY</p>
+
+                <h2>
+                    Designed for
+                    <span>responsible hiring.</span>
+                </h2>
+
+                <p>
+                    INTERVIEW.AI combines structured evaluation,
+                    interview recordings and integrity signals
+                    to help recruiters make informed decisions.
+                </p>
+
+                <div class="security-points">
+                    <div>✓ Consent-based recording</div>
+                    <div>✓ Interview activity monitoring</div>
+                    <div>✓ Evidence-linked evaluation</div>
+                    <div>✓ Human recruiter decision control</div>
+                </div>
+
+            </div>
+
+            <div class="security-panel">
+                <div class="shield-icon">⬢</div>
+                <h3>Session Integrity</h3>
+                <p>
+                    Candidate session is being monitored
+                    for reviewable integrity events.
+                </p>
+
+                <div class="security-status">
+                    <span></span>
+                    System Operational
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer id="contact">
+
+        <div class="footer-brand">
+            <div class="logo">
+                <span class="logo-icon">✦</span>
+                INTERVIEW<span>.AI</span>
+            </div>
+
+            <p>
+                Intelligent interview infrastructure
+                for the future of hiring.
+            </p>
+        </div>
+
+        <div class="footer-links">
+            <a href="#platform">Platform</a>
+            <a href="#process">Process</a>
+            <a href="#security">Security</a>
+            <a href="/login">Sign In</a>
+        </div>
+
+        <div class="copyright">
+            © 2026 INTERVIEW.AI. All rights reserved.
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

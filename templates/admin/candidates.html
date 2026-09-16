@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Candidates | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .candidates-wrapper {
+            max-width: 1150px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .candidate-table-box {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        th {
+            background: #6256e8;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f7f7ff;
+        }
+
+        .view-button {
+            display: inline-block;
+            padding: 9px 15px;
+            border-radius: 8px;
+            background: #6256e8;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .view-button:hover {
+            background: #4b40c9;
+        }
+
+        .empty-box {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .candidate-count {
+            margin: 15px 0 25px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            INTERVIEW<span>.AI</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('admin_dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_candidates') }}">
+                Candidates
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+        </div>
+
+    </nav>
+
+    <main class="candidates-wrapper">
+
+        <section class="welcome-section">
+
+            <p class="small-heading">
+                RECRUITER PANEL
+            </p>
+
+            <h1>
+                Registered Candidates 👥
+            </h1>
+
+            <p>
+                View and manage all registered candidates.
+            </p>
+
+        </section>
+
+        <p class="candidate-count">
+            Total Candidates:
+            <strong>{{ candidates|length }}</strong>
+        </p>
+
+        <section class="candidate-table-box">
+
+            {% if candidates %}
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for candidate in candidates %}
+
+                    <tr>
+
+                        <td>
+                            {{ candidate.id }}
+                        </td>
+
+                        <td>
+                            {{ candidate.name }}
+                        </td>
+
+                        <td>
+                            {{ candidate.email }}
+                        </td>
+
+                        <td>
+                            {{ candidate.role|capitalize }}
+                        </td>
+
+                        <td>
+                            <a class="view-button"
+                               href="{{ url_for('candidate_detail', id=candidate.id) }}">
+                                View Details
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty-box">
+
+                <h2>No candidates found</h2>
+
+                <p>
+                    Registered candidates will appear here.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

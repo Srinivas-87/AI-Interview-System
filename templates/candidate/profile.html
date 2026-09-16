@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">INTERVIEW<span>.AI</span></div>
+
+        <div class="nav-links">
+            <a href="/candidate/dashboard">Dashboard</a>
+            <a href="/login">Logout</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <section class="welcome-section">
+            <p class="small-heading">CANDIDATE PROFILE</p>
+
+            <h1>Complete Your Profile 👤</h1>
+
+            <p>
+                Enter your details so recruiters can understand
+                your skills and background.
+            </p>
+        </section>
+
+        <form class="profile-form">
+
+            <label>Full Name</label>
+            <input type="text" placeholder="Enter your full name">
+
+            <label>Email Address</label>
+            <input type="email" placeholder="Enter your email">
+
+            <label>Phone Number</label>
+            <input type="tel" placeholder="Enter your phone number">
+
+            <label>Qualification</label>
+            <input type="text" placeholder="Example: B.Tech CSE AIML">
+
+            <label>Technical Skills</label>
+            <textarea placeholder="Example: Python, Java, HTML, SQL"></textarea>
+
+            <label>About Yourself</label>
+            <textarea
+                placeholder="Write a short introduction about yourself">
+            </textarea>
+
+            <button type="submit" class="card-button">
+                Save Profile
+            </button>
+
+        </form>
+
+    </main>
+
+</body>
+</html>

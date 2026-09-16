@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Interview Setup | INTERVIEW.AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">INTERVIEW<span>.AI</span></div>
+
+        <div class="nav-links">
+            <a href="/candidate/dashboard">Dashboard</a>
+            <a href="/candidate/profile">Profile</a>
+            <a href="/login">Logout</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <section class="welcome-section">
+            <p class="small-heading">INTERVIEW PREPARATION</p>
+
+            <h1>Set Up Your Interview 🎯</h1>
+
+            <p>
+                Select your interview type and experience level
+                before entering the interview room.
+            </p>
+        </section>
+
+        <form class="profile-form" action="/candidate/interview-setup" method="POST">
+
+            <label for="interview_type">Interview Type</label>
+
+            <select id="interview_type" name="interview_type" required>
+                <option value="">Select Interview Type</option>
+                <option value="Technical Interview">
+                    Technical Interview
+                </option>
+                <option value="HR Interview">
+                    HR Interview
+                </option>
+                <option value="Aptitude Interview">
+                    Aptitude Interview
+                </option>
+                <option value="AI Mock Interview">
+                    AI Mock Interview
+                </option>
+            </select>
+
+            <label for="experience">Experience Level</label>
+
+            <select id="experience" name="experience" required>
+                <option value="">Select Experience Level</option>
+                <option value="Fresher">Fresher</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Experienced">Experienced</option>
+            </select>
+
+            <label for="role">Target Job Role</label>
+
+            <input
+                type="text"
+                id="role"
+                name="role"
+                placeholder="Example: Python Developer"
+                required
+            >
+
+            <label for="duration">Interview Duration</label>
+
+            <select id="duration" name="duration" required>
+                <option value="">Select Duration</option>
+                <option value="15 Minutes">15 Minutes</option>
+                <option value="30 Minutes">30 Minutes</option>
+                <option value="45 Minutes">45 Minutes</option>
+            </select>
+
+            <button type="submit" class="card-button">
+                Continue to System Check →
+            </button>
+
+        </form>
+
+    </main>
+
+</body>
+</html>
