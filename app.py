@@ -8,13 +8,23 @@ import json
 import os
 
 app = Flask(__name__)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = "interview-ai-secret-key-2026"
+
+app.secret_key = os.environ.get(
+    "FLASK_SECRET_KEY",
+    "interview-ai-secret-key-2026"
+)
 
 db = SQLAlchemy(app)
+
 os.makedirs("database", exist_ok=True)
 
+
+# =========================================================
+# USER MODEL
+# =========================================================
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,34 +34,59 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
 
 
+# =========================================================
+# LOGIN REQUIRED
+# =========================================================
+
 def login_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
+
         if "user_id" not in session:
             return redirect(url_for("login"))
+
         return function(*args, **kwargs)
+
     return decorated_function
 
+
+# =========================================================
+# RECRUITER REQUIRED
+# =========================================================
 
 def recruiter_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
+
         if "user_id" not in session:
             return redirect(url_for("login"))
+
         if session.get("role") != "recruiter":
             return "Access denied. Recruiter only."
+
         return function(*args, **kwargs)
+
     return decorated_function
 
+
+# =========================================================
+# HOME
+# =========================================================
 
 @app.route("/")
 def home():
     return render_template("landing.html")
 
 
+# =========================================================
+# REGISTER
+# =========================================================
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
+
     if request.method == "POST":
+
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip().lower()
         role = request.form.get("role", "").strip().lower()
@@ -83,20 +118,28 @@ def register():
 
         if role == "recruiter":
             return redirect(url_for("admin_dashboard"))
+
         return redirect(url_for("candidate_dashboard"))
 
     return render_template("register.html")
 
 
+# =========================================================
+# LOGIN
+# =========================================================
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     if request.method == "POST":
+
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password, password):
+
             session["user_id"] = user.id
             session["name"] = user.name
             session["email"] = user.email
@@ -104,6 +147,7 @@ def login():
 
             if user.role == "recruiter":
                 return redirect(url_for("admin_dashboard"))
+
             return redirect(url_for("candidate_dashboard"))
 
         return "Invalid email or password."
@@ -111,15 +155,26 @@ def login():
     return render_template("login.html")
 
 
+# =========================================================
+# LOGOUT
+# =========================================================
+
 @app.route("/logout")
 def logout():
+
     session.clear()
+
     return redirect(url_for("home"))
 
+
+# =========================================================
+# CANDIDATE DASHBOARD
+# =========================================================
 
 @app.route("/candidate/dashboard")
 @login_required
 def candidate_dashboard():
+
     if session.get("role") != "candidate":
         return "Access denied. Candidate only."
 
@@ -130,9 +185,14 @@ def candidate_dashboard():
     )
 
 
+# =========================================================
+# CANDIDATE PROFILE
+# =========================================================
+
 @app.route("/candidate/profile")
 @login_required
 def candidate_profile():
+
     if session.get("role") != "candidate":
         return "Access denied. Candidate only."
 
@@ -143,36 +203,58 @@ def candidate_profile():
     )
 
 
+# =========================================================
+# INTERVIEW SETUP
+# =========================================================
+
 @app.route("/candidate/interview-setup", methods=["GET", "POST"])
 @login_required
 def interview_setup():
+
     if session.get("role") != "candidate":
         return "Access denied. Candidate only."
 
     if request.method == "POST":
+
         session["interview_role"] = request.form.get(
-            "interview_role", "Software Developer"
+            "interview_role",
+            "Software Developer"
         )
+
         session["experience_level"] = request.form.get(
-            "experience_level", "Fresher"
+            "experience_level",
+            "Fresher"
         )
+
         session["interview_started"] = True
+
         return redirect(url_for("system_check"))
 
     return render_template("candidate/interview-setup.html")
 
 
+# =========================================================
+# SYSTEM CHECK
+# =========================================================
+
 @app.route("/candidate/system-check")
 @login_required
 def system_check():
+
     if session.get("role") != "candidate":
         return "Access denied. Candidate only."
+
     return render_template("candidate/system-check.html")
 
+
+# =========================================================
+# INTERVIEW ROOM
+# =========================================================
 
 @app.route("/candidate/interview-room")
 @login_required
 def interview_room():
+
     if session.get("role") != "candidate":
         return "Access denied. Candidate only."
 
@@ -182,42 +264,73 @@ def interview_room():
     return render_template(
         "candidate/interview-room.html",
         user_name=session.get("name"),
-        interview_role=session.get("interview_role", "Software Developer"),
-        experience_level=session.get("experience_level", "Fresher")
+        interview_role=session.get(
+            "interview_role",
+            "Software Developer"
+        ),
+        experience_level=session.get(
+            "experience_level",
+            "Fresher"
+        )
     )
 
+
+# =========================================================
+# RESULT
+# =========================================================
 
 @app.route("/candidate/result")
 @login_required
 def candidate_result():
+
     if session.get("role") != "candidate":
         return "Access denied. Candidate only."
 
     return render_template(
         "candidate/result.html",
         user_name=session.get("name"),
-        interview_role=session.get("interview_role", "Software Developer")
+        interview_role=session.get(
+            "interview_role",
+            "Software Developer"
+        )
     )
 
+
+# =========================================================
+# GEMINI AI ANSWER EVALUATION
+# =========================================================
 
 @app.route("/api/evaluate-answer", methods=["POST"])
 @login_required
 def evaluate_answer():
+
     if session.get("role") != "candidate":
+
         return jsonify({
             "success": False,
             "message": "Candidate access only."
         }), 403
 
     data = request.get_json(silent=True) or {}
+
     question = data.get("question", "").strip()
     answer = data.get("answer", "").strip()
 
     if not question or not answer:
+
         return jsonify({
             "success": False,
             "message": "Question and answer are required."
         }), 400
+
+    api_key = os.environ.get("GEMINI_API_KEY")
+
+    if not api_key:
+
+        return jsonify({
+            "success": False,
+            "message": "Gemini API key is not configured on the server."
+        }), 500
 
     prompt = f"""
 You are a strict and fair technical interview evaluator.
@@ -228,78 +341,201 @@ Question:
 Candidate Answer:
 {answer}
 
-Evaluate the answer based on relevance, correctness, clarity,
-technical understanding, and completeness.
+Evaluate the candidate answer based on:
 
-Return ONLY valid JSON in this exact format:
+1. Relevance
+2. Correctness
+3. Technical understanding
+4. Clarity
+5. Completeness
+
+Important rules:
+
+- Do NOT mark unrelated answers as correct.
+- Do NOT mark random or meaningless text as correct.
+- If the answer does not answer the question, score it very low.
+- If the answer is completely wrong, status must be Incorrect.
+- If the answer has some correct information but important mistakes,
+  status must be Partially Correct.
+- Only use Correct when the answer genuinely answers the question.
+- Score must be from 0 to 10.
+
+Return ONLY valid JSON.
+
+Use exactly this format:
+
 {{
-  "score": 0,
-  "status": "Correct",
-  "feedback": "short clear feedback",
-  "improvement": "specific improvement suggestion"
+    "score": 0,
+    "status": "Incorrect",
+    "feedback": "Short explanation of the evaluation.",
+    "improvement": "Specific suggestion for improvement."
 }}
 
-Rules:
-- score must be a number from 0 to 10.
-- status must be exactly one of:
-  "Correct", "Partially Correct", "Incorrect".
-- Do not mark unrelated or meaningless answers as correct.
-- If the answer is empty, unrelated, or nonsense, score 0 and status Incorrect.
-- Return JSON only. No markdown.
+Allowed status values:
+
+Correct
+Partially Correct
+Incorrect
 """
 
     try:
+
+        # Gemini REST API
+        url = (
+            "https://generativelanguage.googleapis.com/"
+            "v1beta/models/gemini-2.5-flash:generateContent"
+        )
+
         response = requests.post(
-            "http://127.0.0.1:11434/api/generate",
-            json={
-                "model": "llama3.2",
-                "prompt": prompt,
-                "stream": False,
-                "format": "json"
+            url,
+            params={
+                "key": api_key
             },
-            timeout=120
+            json={
+                "contents": [
+                    {
+                        "parts": [
+                            {
+                                "text": prompt
+                            }
+                        ]
+                    }
+                ],
+                "generationConfig": {
+                    "temperature": 0.2,
+                    "responseMimeType": "application/json"
+                }
+            },
+            timeout=60
         )
 
         response.raise_for_status()
-        ai_response = response.json().get("response", "").strip()
-        result = json.loads(ai_response)
+
+        response_data = response.json()
+
+        candidates = response_data.get("candidates", [])
+
+        if not candidates:
+
+            return jsonify({
+                "success": False,
+                "message": "Gemini did not return an evaluation."
+            }), 502
+
+        text = (
+            candidates[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", "")
+            .strip()
+        )
+
+        if not text:
+
+            return jsonify({
+                "success": False,
+                "message": "Gemini returned an empty response."
+            }), 502
+
+        result = json.loads(text)
 
         score = float(result.get("score", 0))
+
         score = max(0, min(10, score))
+
+        status = result.get(
+            "status",
+            "Incorrect"
+        )
+
+        allowed_statuses = [
+            "Correct",
+            "Partially Correct",
+            "Incorrect"
+        ]
+
+        if status not in allowed_statuses:
+            status = "Incorrect"
+
+        feedback = str(
+            result.get("feedback", "")
+        )
+
+        improvement = str(
+            result.get("improvement", "")
+        )
 
         return jsonify({
             "success": True,
             "score": score,
-            "status": result.get("status", "Incorrect"),
-            "feedback": result.get("feedback", ""),
-            "improvement": result.get("improvement", "")
+            "status": status,
+            "feedback": feedback,
+            "improvement": improvement
         })
 
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.HTTPError as error:
+
+        print("Gemini HTTP Error:", error)
+
+        try:
+            error_details = response.json()
+            print("Gemini Response:", error_details)
+        except Exception:
+            pass
+
         return jsonify({
             "success": False,
-            "message": "Ollama is not running. Open CMD and run: ollama serve"
-        }), 503
+            "message": "Gemini API request failed. Check the Render logs."
+        }), 502
 
     except requests.exceptions.Timeout:
+
         return jsonify({
             "success": False,
-            "message": "AI took too long. Please try again."
+            "message": "Gemini took too long to respond. Please try again."
         }), 504
 
-    except Exception as error:
-        print("AI Evaluation Error:", error)
+    except json.JSONDecodeError:
+
         return jsonify({
             "success": False,
-            "message": "AI evaluation failed. Check the terminal."
+            "message": "Gemini returned an invalid evaluation format."
+        }), 502
+
+    except requests.exceptions.RequestException as error:
+
+        print("Gemini Request Error:", error)
+
+        return jsonify({
+            "success": False,
+            "message": "Could not connect to Gemini."
+        }), 502
+
+    except Exception as error:
+
+        print("AI Evaluation Error:", error)
+
+        return jsonify({
+            "success": False,
+            "message": "AI evaluation failed. Check the Render logs."
         }), 500
 
+
+# =========================================================
+# ADMIN DASHBOARD
+# =========================================================
 
 @app.route("/admin/dashboard")
 @recruiter_required
 def admin_dashboard():
-    total_candidates = User.query.filter_by(role="candidate").count()
-    total_recruiters = User.query.filter_by(role="recruiter").count()
+
+    total_candidates = User.query.filter_by(
+        role="candidate"
+    ).count()
+
+    total_recruiters = User.query.filter_by(
+        role="recruiter"
+    ).count()
 
     return render_template(
         "admin/dashboard.html",
@@ -309,18 +545,39 @@ def admin_dashboard():
     )
 
 
+# =========================================================
+# ADMIN CANDIDATES
+# =========================================================
+
 @app.route("/admin/candidates")
 @recruiter_required
 def admin_candidates():
-    candidates = User.query.filter_by(role="candidate").all()
-    return render_template("admin/candidates.html", candidates=candidates)
 
+    candidates = User.query.filter_by(
+        role="candidate"
+    ).all()
+
+    return render_template(
+        "admin/candidates.html",
+        candidates=candidates
+    )
+
+
+# =========================================================
+# ADMIN CANDIDATE DETAIL
+# =========================================================
 
 @app.route("/admin/candidate-detail")
 @recruiter_required
 def candidate_detail():
+
     candidate_id = request.args.get("id")
-    candidate = User.query.get(candidate_id) if candidate_id else None
+
+    candidate = (
+        User.query.get(candidate_id)
+        if candidate_id
+        else None
+    )
 
     return render_template(
         "admin/candidate-detail.html",
@@ -328,28 +585,61 @@ def candidate_detail():
     )
 
 
+# =========================================================
+# ADMIN LIVE INTERVIEW
+# =========================================================
+
 @app.route("/admin/live-interview")
 @recruiter_required
 def live_interview():
-    return render_template("admin/live-interview.html")
 
+    return render_template(
+        "admin/live-interview.html"
+    )
+
+
+# =========================================================
+# DATABASE
+# =========================================================
 
 with app.app_context():
     db.create_all()
 
 
+# =========================================================
+# CATEGORIES
+# =========================================================
+
 @app.route("/categories")
 def categories():
-    return render_template("categories.html")
 
-
-@app.route("/start-interview/<category>")
-def start_interview(category):
     return render_template(
-        "interview-room.html",
-        category=category.replace("-", " ").title()
+        "categories.html"
     )
 
 
+# =========================================================
+# START INTERVIEW
+# =========================================================
+
+@app.route("/start-interview/<category>")
+def start_interview(category):
+
+    return render_template(
+        "interview-room.html",
+        category=category.replace(
+            "-",
+            " "
+        ).title()
+    )
+
+
+# =========================================================
+# RUN APP
+# =========================================================
+
 if __name__ == "__main__":
-    app.run(debug=True)
+
+    app.run(
+        debug=True
+    )
