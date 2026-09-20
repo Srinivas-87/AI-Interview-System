@@ -70,15 +70,9 @@ def login_required(function):
     def decorated_function(*args, **kwargs):
 
         if "user_id" not in session:
+            return redirect(url_for("login"))
 
-            return redirect(
-                url_for("login")
-            )
-
-        return function(
-            *args,
-            **kwargs
-        )
+        return function(*args, **kwargs)
 
     return decorated_function
 
@@ -93,19 +87,12 @@ def recruiter_required(function):
     def decorated_function(*args, **kwargs):
 
         if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
+            return redirect(url_for("login"))
 
         if session.get("role") != "recruiter":
-
             return "Access denied. Recruiter only."
 
-        return function(
-            *args,
-            **kwargs
-        )
+        return function(*args, **kwargs)
 
     return decorated_function
 
@@ -161,18 +148,14 @@ def register():
             or not password
         ):
 
-            return (
-                "Please fill all registration fields."
-            )
+            return "Please fill all registration fields."
 
         if role not in [
             "candidate",
             "recruiter"
         ]:
 
-            return (
-                "Invalid role selected."
-            )
+            return "Invalid role selected."
 
         if User.query.filter_by(
             email=email
@@ -184,13 +167,9 @@ def register():
             )
 
         new_user = User(
-
             name=name,
-
             email=email,
-
             role=role,
-
             password=generate_password_hash(
                 password
             )
@@ -210,15 +189,11 @@ def register():
         if role == "recruiter":
 
             return redirect(
-                url_for(
-                    "admin_dashboard"
-                )
+                url_for("admin_dashboard")
             )
 
         return redirect(
-            url_for(
-                "candidate_dashboard"
-            )
+            url_for("candidate_dashboard")
         )
 
     return render_template(
@@ -268,20 +243,14 @@ def login():
             if user.role == "recruiter":
 
                 return redirect(
-                    url_for(
-                        "admin_dashboard"
-                    )
+                    url_for("admin_dashboard")
                 )
 
             return redirect(
-                url_for(
-                    "candidate_dashboard"
-                )
+                url_for("candidate_dashboard")
             )
 
-        return (
-            "Invalid email or password."
-        )
+        return "Invalid email or password."
 
     return render_template(
         "login.html"
@@ -312,21 +281,12 @@ def candidate_dashboard():
 
     if session.get("role") != "candidate":
 
-        return (
-            "Access denied. Candidate only."
-        )
+        return "Access denied. Candidate only."
 
     return render_template(
-
         "candidate/dashboard.html",
-
-        user_name=session.get(
-            "name"
-        ),
-
-        user_email=session.get(
-            "email"
-        )
+        user_name=session.get("name"),
+        user_email=session.get("email")
     )
 
 
@@ -340,21 +300,12 @@ def candidate_profile():
 
     if session.get("role") != "candidate":
 
-        return (
-            "Access denied. Candidate only."
-        )
+        return "Access denied. Candidate only."
 
     return render_template(
-
         "candidate/profile.html",
-
-        user_name=session.get(
-            "name"
-        ),
-
-        user_email=session.get(
-            "email"
-        )
+        user_name=session.get("name"),
+        user_email=session.get("email")
     )
 
 
@@ -371,9 +322,7 @@ def interview_setup():
 
     if session.get("role") != "candidate":
 
-        return (
-            "Access denied. Candidate only."
-        )
+        return "Access denied. Candidate only."
 
     if request.method == "POST":
 
@@ -394,9 +343,7 @@ def interview_setup():
         session["interview_started"] = True
 
         return redirect(
-            url_for(
-                "system_check"
-            )
+            url_for("system_check")
         )
 
     return render_template(
@@ -414,9 +361,7 @@ def system_check():
 
     if session.get("role") != "candidate":
 
-        return (
-            "Access denied. Candidate only."
-        )
+        return "Access denied. Candidate only."
 
     return render_template(
         "candidate/system-check.html"
@@ -433,33 +378,23 @@ def interview_room():
 
     if session.get("role") != "candidate":
 
-        return (
-            "Access denied. Candidate only."
-        )
+        return "Access denied. Candidate only."
 
     if not session.get(
         "interview_started"
     ):
 
         return redirect(
-            url_for(
-                "interview_setup"
-            )
+            url_for("interview_setup")
         )
 
     return render_template(
-
         "candidate/interview-room.html",
-
-        user_name=session.get(
-            "name"
-        ),
-
+        user_name=session.get("name"),
         interview_role=session.get(
             "interview_role",
             "Software Developer"
         ),
-
         experience_level=session.get(
             "experience_level",
             "Fresher"
@@ -477,18 +412,11 @@ def candidate_result():
 
     if session.get("role") != "candidate":
 
-        return (
-            "Access denied. Candidate only."
-        )
+        return "Access denied. Candidate only."
 
     return render_template(
-
         "candidate/result.html",
-
-        user_name=session.get(
-            "name"
-        ),
-
+        user_name=session.get("name"),
         interview_role=session.get(
             "interview_role",
             "Software Developer"
@@ -508,47 +436,44 @@ def candidate_result():
 def evaluate_answer():
 
     # -----------------------------------------------------
-    # CANDIDATE ACCESS CHECK
+    # CANDIDATE ACCESS
     # -----------------------------------------------------
 
     if session.get("role") != "candidate":
 
         return jsonify({
-
             "success": False,
-
-            "message":
-                "Candidate access only."
-
+            "message": "Candidate access only."
         }), 403
 
     # -----------------------------------------------------
-    # GET REQUEST DATA
+    # REQUEST DATA
     # -----------------------------------------------------
 
     data = request.get_json(
         silent=True
     ) or {}
 
-    question = data.get(
-        "question",
-        ""
+    question = str(
+        data.get(
+            "question",
+            ""
+        )
     ).strip()
 
-    answer = data.get(
-        "answer",
-        ""
+    answer = str(
+        data.get(
+            "answer",
+            ""
+        )
     ).strip()
 
     if not question or not answer:
 
         return jsonify({
-
             "success": False,
-
             "message":
                 "Question and answer are required."
-
         }), 400
 
     # -----------------------------------------------------
@@ -562,24 +487,18 @@ def evaluate_answer():
     if not api_key:
 
         return jsonify({
-
             "success": False,
-
             "message":
                 "Gemini API key is not configured on the server."
-
         }), 500
 
     # -----------------------------------------------------
-    # AI EVALUATION PROMPT
+    # EVALUATION PROMPT
     # -----------------------------------------------------
 
     prompt = f"""
 You are a strict and fair professional technical
 interview evaluator.
-
-You are evaluating a candidate in an AI-powered
-corporate interview system.
 
 QUESTION:
 {question}
@@ -587,7 +506,7 @@ QUESTION:
 CANDIDATE ANSWER:
 {answer}
 
-Evaluate the candidate answer using these criteria:
+Evaluate the candidate answer using:
 
 1. Relevance
 2. Correctness
@@ -595,65 +514,90 @@ Evaluate the candidate answer using these criteria:
 4. Clarity
 5. Completeness
 
-IMPORTANT EVALUATION RULES:
+Rules:
 
-- The answer must directly address the question.
-- Do NOT mark unrelated answers as correct.
-- Do NOT mark random text as correct.
-- Do NOT give a high score to meaningless answers.
-- If the answer does not answer the question,
-  score it very low.
-- If the answer is completely wrong,
-  status MUST be "Incorrect".
-- If the answer contains some correct information
-  but also has important mistakes or missing points,
-  status MUST be "Partially Correct".
-- Only use "Correct" when the answer genuinely
-  answers the question accurately.
+- The candidate must directly answer the question.
+- Unrelated answers must NOT be marked correct.
+- Random or meaningless text must NOT be marked correct.
+- Completely wrong answers must receive Incorrect.
+- Answers containing some correct information but important
+  mistakes or missing information must receive Partially Correct.
+- Only genuinely accurate answers should receive Correct.
 - Score must be between 0 and 10.
 - Be strict but fair.
-- Give useful interview feedback.
+- Feedback must be useful for a technical interview candidate.
 
-Return ONLY a valid JSON object.
-
-Use exactly this structure:
-
-{{
-    "score": 0,
-    "status": "Incorrect",
-    "feedback": "Short explanation of why the answer received this score.",
-    "improvement": "Specific advice for improving the answer."
-}}
-
-Allowed status values:
-
-Correct
-Partially Correct
-Incorrect
+Return the evaluation according to the provided JSON schema.
 """
+
+
+    # =====================================================
+    # GEMINI INTERACTIONS API
+    # =====================================================
+
+    url = (
+        "https://generativelanguage.googleapis.com/"
+        "v1beta/interactions"
+    )
+
+    # -----------------------------------------------------
+    # JSON SCHEMA
+    # -----------------------------------------------------
+
+    response_schema = {
+
+        "type": "object",
+
+        "properties": {
+
+            "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+            },
+
+            "status": {
+                "type": "string",
+                "enum": [
+                    "Correct",
+                    "Partially Correct",
+                    "Incorrect"
+                ]
+            },
+
+            "feedback": {
+                "type": "string"
+            },
+
+            "improvement": {
+                "type": "string"
+            }
+
+        },
+
+        "required": [
+            "score",
+            "status",
+            "feedback",
+            "improvement"
+        ]
+
+    }
+
 
     try:
 
         # =================================================
-        # GEMINI INTERACTIONS API
+        # GEMINI REQUEST
         # =================================================
-
-        url = (
-            "https://generativelanguage.googleapis.com/"
-            "v1beta/interactions"
-        )
 
         response = requests.post(
 
             url,
 
-            params={
-                "key": api_key
-            },
-
             headers={
-                "Content-Type":
-                    "application/json"
+                "x-goog-api-key": api_key,
+                "Content-Type": "application/json"
             },
 
             json={
@@ -664,22 +608,26 @@ Incorrect
                 "input":
                     prompt,
 
-                "generation_config": {
+                "response_format": {
 
-                    "max_output_tokens":
-                        500
-                },
+                    "type":
+                        "text",
 
-                "store":
-                    False
+                    "mime_type":
+                        "application/json",
+
+                    "schema":
+                        response_schema
+                }
+
             },
 
             timeout=60
         )
 
-        # -------------------------------------------------
-        # HTTP ERROR CHECK
-        # -------------------------------------------------
+        # =================================================
+        # HTTP ERROR
+        # =================================================
 
         if not response.ok:
 
@@ -705,34 +653,26 @@ Incorrect
 
             }), 502
 
-        # -------------------------------------------------
-        # PARSE RESPONSE
-        # -------------------------------------------------
+
+        # =================================================
+        # RESPONSE JSON
+        # =================================================
 
         response_data = response.json()
 
         print(
-            "Gemini Interaction Response:",
+            "Gemini Response:",
             response_data
         )
 
-        # -------------------------------------------------
-        # CHECK INTERACTION STATUS
-        # -------------------------------------------------
 
-        interaction_status = (
-            response_data.get(
-                "status",
-                ""
-            )
-        )
+        # =================================================
+        # CHECK STATUS
+        # =================================================
 
-        if interaction_status == "failed":
-
-            print(
-                "Gemini interaction failed:",
-                response_data
-            )
+        if response_data.get(
+            "status"
+        ) == "failed":
 
             return jsonify({
 
@@ -743,9 +683,10 @@ Incorrect
 
             }), 502
 
-        # -------------------------------------------------
-        # EXTRACT MODEL OUTPUT
-        # -------------------------------------------------
+
+        # =================================================
+        # EXTRACT MODEL TEXT
+        # =================================================
 
         text = ""
 
@@ -773,28 +714,46 @@ Incorrect
                     "type"
                 ) == "text":
 
-                    text = item.get(
-                        "text",
-                        ""
+                    text = str(
+                        item.get(
+                            "text",
+                            ""
+                        )
                     ).strip()
 
                     if text:
-
                         break
 
             if text:
-
                 break
 
-        # -------------------------------------------------
-        # OUTPUT VALIDATION
-        # -------------------------------------------------
+
+        # =================================================
+        # FALLBACK: OUTPUT FIELD
+        # =================================================
+
+        if not text:
+
+            output = response_data.get(
+                "output"
+            )
+
+            if isinstance(
+                output,
+                str
+            ):
+
+                text = output.strip()
+
+
+        # =================================================
+        # NO OUTPUT
+        # =================================================
 
         if not text:
 
             print(
-                "Gemini returned no text:",
-                response_data
+                "Gemini returned no evaluation."
             )
 
             return jsonify({
@@ -806,42 +765,52 @@ Incorrect
 
             }), 502
 
+
         print(
-            "Gemini Evaluation Text:",
+            "Gemini Evaluation:",
             text
         )
 
-        # -------------------------------------------------
-        # REMOVE MARKDOWN JSON FENCES
-        # -------------------------------------------------
+
+        # =================================================
+        # CLEAN MARKDOWN
+        # =================================================
+
+        text = text.strip()
 
         if text.startswith(
-            "```"
+            "```json"
         ):
 
-            text = text.replace(
-                "```json",
-                ""
-            )
-
-            text = text.replace(
-                "```",
-                ""
-            )
+            text = text[
+                len("```json"):
+            ]
 
             text = text.strip()
 
-        # -------------------------------------------------
-        # PARSE AI JSON
-        # -------------------------------------------------
+        if text.endswith(
+            "```"
+        ):
+
+            text = text[
+                :-3
+            ]
+
+            text = text.strip()
+
+
+        # =================================================
+        # PARSE JSON
+        # =================================================
 
         result = json.loads(
             text
         )
 
-        # -------------------------------------------------
+
+        # =================================================
         # SCORE
-        # -------------------------------------------------
+        # =================================================
 
         try:
 
@@ -859,6 +828,7 @@ Incorrect
 
             score = 0
 
+
         score = max(
             0,
             min(
@@ -867,9 +837,10 @@ Incorrect
             )
         )
 
-        # -------------------------------------------------
+
+        # =================================================
         # STATUS
-        # -------------------------------------------------
+        # =================================================
 
         status = result.get(
             "status",
@@ -890,31 +861,30 @@ Incorrect
 
             status = "Incorrect"
 
-        # -------------------------------------------------
+
+        # =================================================
         # FEEDBACK
-        # -------------------------------------------------
+        # =================================================
 
         feedback = str(
-
             result.get(
                 "feedback",
                 ""
             )
-
         ).strip()
 
-        improvement = str(
 
+        improvement = str(
             result.get(
                 "improvement",
                 ""
             )
-
         ).strip()
 
-        # -------------------------------------------------
-        # FINAL RESPONSE
-        # -------------------------------------------------
+
+        # =================================================
+        # RETURN RESULT
+        # =================================================
 
         return jsonify({
 
@@ -929,6 +899,7 @@ Incorrect
             "improvement": improvement
 
         })
+
 
     # =====================================================
     # TIMEOUT
@@ -949,8 +920,9 @@ Incorrect
 
         }), 504
 
+
     # =====================================================
-    # CONNECTION ERROR
+    # REQUEST ERROR
     # =====================================================
 
     except requests.exceptions.RequestException as error:
@@ -969,8 +941,9 @@ Incorrect
 
         }), 502
 
+
     # =====================================================
-    # INVALID JSON FROM GEMINI
+    # JSON ERROR
     # =====================================================
 
     except json.JSONDecodeError as error:
@@ -981,7 +954,7 @@ Incorrect
         )
 
         print(
-            "Invalid Gemini Text:",
+            "Gemini Raw Text:",
             text if "text" in locals() else ""
         )
 
@@ -993,6 +966,7 @@ Incorrect
                 "Gemini returned an invalid evaluation format."
 
         }), 502
+
 
     # =====================================================
     # OTHER ERROR
@@ -1032,17 +1006,12 @@ def admin_dashboard():
     ).count()
 
     return render_template(
-
         "admin/dashboard.html",
-
-        total_candidates=
-            total_candidates,
-
-        total_recruiters=
-            total_recruiters,
-
-        recruiter_name=
-            session.get("name")
+        total_candidates=total_candidates,
+        total_recruiters=total_recruiters,
+        recruiter_name=session.get(
+            "name"
+        )
     )
 
 
@@ -1059,9 +1028,7 @@ def admin_candidates():
     ).all()
 
     return render_template(
-
         "admin/candidates.html",
-
         candidates=candidates
     )
 
@@ -1079,20 +1046,15 @@ def candidate_detail():
     )
 
     candidate = (
-
         User.query.get(
             candidate_id
         )
-
         if candidate_id
-
         else None
     )
 
     return render_template(
-
         "admin/candidate-detail.html",
-
         candidate=candidate
     )
 
@@ -1141,9 +1103,7 @@ def categories():
 def start_interview(category):
 
     return render_template(
-
         "interview-room.html",
-
         category=category.replace(
             "-",
             " "
